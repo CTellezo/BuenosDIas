@@ -16,7 +16,7 @@ public class daoComentario {
 		cx = new conexion();
 	}
 
-	public boolean insertarUsuario(Usuario user) {
+	public boolean insertarcomentario(Usuario user) {
 		PreparedStatement ps = null;
 		try {
 			ps = cx.conectar().prepareStatement("INSERT INTO usuario VALUES(null,?,?,?)");
@@ -55,7 +55,7 @@ public class daoComentario {
 		return lista;
 	}
 
-	public boolean loginUsuario(Usuario user) {
+	public boolean logincomentario(Usuario user) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -76,7 +76,7 @@ public class daoComentario {
 
 	}
 
-	public boolean EliminarUsuario(int Id) {
+	public boolean Eliminarcomentario(int Id) {
 		PreparedStatement ps = null;
 		try {
 			ps = cx.conectar().prepareStatement("DELETE FROM usuario WHERE id=?");

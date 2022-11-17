@@ -1,4 +1,6 @@
 /Conexion/
-/vista/
-/modelo/
 /dao/
+/img/
+/modelo/
+/sqlite-jdbc-3.39.3.0.jar
+/vista/

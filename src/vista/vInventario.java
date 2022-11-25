@@ -18,7 +18,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import dao.daoCategoria;
+import dao.daoComandos;
 import dao.daoUsuario;
+import modelo.Abastecer;
 import modelo.Categoria;
 import modelo.Usuario;
 import java.awt.event.ActionListener;
@@ -27,30 +29,37 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Toolkit;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import java.awt.Color;
 
-public class vCategoria extends JFrame {
+public class vInventario extends JFrame {
 
 	private JPanel contentPane;
 	int fila = -1;
-	private JTextField txtCategoria;
-	private JTable tblCategoria;
+	private JTextField txtD;
+	private JTable tblinventario;
 	private JLabel lblID;
 	private JButton btnAgregar;
 	private JButton btnEliminar;
 	private JButton btnEditar;
 	private JButton btnBorrar;
 	private JScrollPane scrollPane;
-	daoCategoria dao = new daoCategoria();
+	daoComandos dao = new daoComandos();
 	DefaultTableModel modelo = new DefaultTableModel();
-	ArrayList<Categoria> lista = new ArrayList<Categoria>();
-	Categoria categoria;
+	ArrayList<Abastecer> lista = new ArrayList<Abastecer>();
+	Abastecer abastecer;
+	private JSlider sldCantidad;
+	int producto;
+	private JLabel lblP;
 	
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					vCategoria frame = new vCategoria();
+					vInventario frame = new vInventario();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -63,15 +72,15 @@ public class vCategoria extends JFrame {
 	 * Create the frame.
 	 */
 	public void limpiar() {
-		txtCategoria.setText("");
-		lblID.setText("");
+		txtD.setText("");
+	    lblP.setText("");
 	}
 
-	public vCategoria() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(vCategoria.class.getResource("/img/Java.jpg")));
+	public vInventario() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(vInventario.class.getResource("/img/Java.jpg")));
 		setTitle("CATEGORIA");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 600, 376);
+		setBounds(100, 100, 642, 424);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -79,27 +88,28 @@ public class vCategoria extends JFrame {
 		contentPane.setLayout(null);
 		JLabel lblNewLabel = new JLabel("ID");
 		lblNewLabel.setFont(new Font("Nirmala UI", Font.BOLD, 19));
-		lblNewLabel.setBounds(25, 32, 46, 23);
+		lblNewLabel.setBounds(20, 21, 46, 23);
 		contentPane.add(lblNewLabel);
 		lblID = new JLabel("1");
 		lblID.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblID.setBounds(138, 32, 73, 20);
+		lblID.setBounds(148, 24, 73, 20);
 		contentPane.add(lblID);
-		txtCategoria = new JTextField();
-		txtCategoria.setBounds(138, 75, 174, 34);
-		contentPane.add(txtCategoria);
-		txtCategoria.setColumns(10);
+		txtD = new JTextField();
+		txtD.setBounds(148, 63, 174, 34);
+		contentPane.add(txtD);
+		txtD.setColumns(10);
 		btnAgregar = new JButton("Agregar");
 		btnAgregar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (txtCategoria.getText().equals("")) {
+					if (txtD.getText().equals("")|| sldCantidad.getAccessibleContext().equals("")) {
 						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
 						return;
 					}
-					Categoria user = new Categoria();
-					user.setCategoria(txtCategoria.getText());
-					if (dao.insertarCategoria(user)) {
+					Abastecer user = new Abastecer();
+					user.setDescripcion(txtD.getText());
+					user.setCantidad(sldCantidad.getValue());
+					if (dao.insertarProducto(user)) {
 						actualizarTabla();
 						limpiar();
 						JOptionPane.showMessageDialog(null, "SE AGREGO CORRECTAMENTE");
@@ -113,20 +123,20 @@ public class vCategoria extends JFrame {
 		});
 		btnAgregar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnAgregar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnAgregar.setBounds(320, 11, 112, 41);
+		btnAgregar.setBounds(335, 14, 112, 41);
 		contentPane.add(btnAgregar);
 
 		btnEditar = new JButton("Editar");
 		btnEditar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (txtCategoria.getText().equals("") || lblID.getText().equals("")) {
+					if (txtD.getText().equals("") || sldCantidad.getAccessibleContext().equals("")) {
 						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
 						return;
 					}
-					categoria.setCategoria(txtCategoria.getText());
-					categoria.setCategoria(lblID.getText());
-					if (dao.editarUsuario(categoria)) {
+					abastecer.setDescripcion(txtD.getText());
+					abastecer.setCantidad(sldCantidad.getValue());
+					if (dao.editarProducto(abastecer)) {
 						actualizarTabla();
 						limpiar();
 						JOptionPane.showMessageDialog(null, "SE ACTUALIZO  CORRECTAMENTE");
@@ -140,16 +150,16 @@ public class vCategoria extends JFrame {
 		});
 		btnEditar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEditar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEditar.setBounds(322, 70, 108, 41);
+		btnEditar.setBounds(489, 14, 112, 41);
 		contentPane.add(btnEditar);
 		btnEliminar = new JButton("Eliminar");
 		btnEliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					
-					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTA CATEGORIA?","ELIMINAR CATEGORIA", JOptionPane.YES_NO_OPTION);
+					int opcion = JOptionPane.showConfirmDialog(null, "¿ESTA SEGURO DE ELIMINAR ESTE PRODUCTO?","ELIMINAR PRODUCTO", JOptionPane.YES_NO_OPTION);
 					if (opcion == 0) {
-						if (dao.EliminarCategoria(lista.get(fila).getID())) {
+						if (dao.EliminarProducto(lista.get(fila).getId())) {
 							actualizarTabla();
 							JOptionPane.showMessageDialog(null, "SE ELIMINO CORRECTAMENTE");
 						} else {
@@ -163,19 +173,17 @@ public class vCategoria extends JFrame {
 		});
 		btnEliminar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnEliminar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnEliminar.setBounds(455, 70, 103, 39);
+		btnEliminar.setBounds(415, 139, 103, 39);
 		contentPane.add(btnEliminar);
 		btnBorrar = new JButton("Borrar");
 		btnBorrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				lblID.setText("");
-				txtCategoria.setText(null);
 				limpiar();
 			}
 		});
 		btnBorrar.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnBorrar.setFont(new Font("Imprint MT Shadow", Font.ITALIC, 17));
-		btnBorrar.setBounds(455, 11, 103, 41);
+		btnBorrar.setBounds(415, 70, 103, 41);
 		contentPane.add(btnBorrar);
 		scrollPane = new JScrollPane();
 		scrollPane.addMouseListener(new MouseAdapter() {
@@ -183,31 +191,61 @@ public class vCategoria extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		scrollPane.setBounds(25, 150, 533, 158);
+		scrollPane.setBounds(34, 196, 533, 158);
 		contentPane.add(scrollPane);
-		tblCategoria = new JTable();
-		tblCategoria.addMouseListener(new MouseAdapter() {
+		tblinventario = new JTable();
+		tblinventario.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				fila = tblCategoria.getSelectedRow();
-				fila = tblCategoria.getSelectedRow();
-				categoria = lista.get(fila);
-				lblID.setText("" + lista.get(fila).getID());
-				txtCategoria.setText(categoria.getCategoria());
+				fila = tblinventario.getSelectedRow();
+				fila = tblinventario.getSelectedRow();
+				abastecer = lista.get(fila);
+				lblID.setText("" + lista.get(fila).getId());
+				txtD.setText(abastecer.getDescripcion());
+				sldCantidad.setValue(abastecer.getCantidad());
 			}
 		});
-		tblCategoria.setModel(new DefaultTableModel(
+		tblinventario.setModel(new DefaultTableModel(
 				new Object[][] { { null, null, null, null }, { null, null, null, null }, { null, null, null, null }, },
 				new String[] { "New column", "New column", "New column", "New column" }));
-		scrollPane.setViewportView(tblCategoria);
+		scrollPane.setViewportView(tblinventario);
 		modelo.addColumn("ID");
-		modelo.addColumn("CATEGORIA");
-		tblCategoria.setModel(modelo);
+		modelo.addColumn("DESCRIPCION");
+		modelo.addColumn("CANTIDAD");
+		tblinventario.setModel(modelo);
 		
-		JLabel lblCategoria = new JLabel("Categoria");
+		JLabel lblCategoria = new JLabel("Descripcion");
 		lblCategoria.setFont(new Font("Nirmala UI", Font.BOLD, 19));
-		lblCategoria.setBounds(25, 77, 103, 23);
+		lblCategoria.setBounds(20, 65, 118, 23);
 		contentPane.add(lblCategoria);
+		
+		sldCantidad =  new JSlider();
+		sldCantidad.setPaintTicks(true);
+		sldCantidad.setForeground(new Color(139, 69, 19));
+		sldCantidad.setMinimum(1);
+		sldCantidad.setValue(0);
+		sldCantidad.setMinorTickSpacing(5);
+		sldCantidad.setMajorTickSpacing(25);
+		sldCantidad.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				producto = sldCantidad.getValue();
+				lblP.setText(""+ producto);
+				actualizarTabla();
+			}
+		});
+		sldCantidad.setValue(0);
+		sldCantidad.setBounds(108, 123, 223, 41);
+		contentPane.add(sldCantidad);
+		
+		JLabel lblCantidad = new JLabel("Cantidad");
+		lblCantidad.setFont(new Font("Nirmala UI", Font.BOLD, 19));
+		lblCantidad.setBounds(18, 119, 103, 34);
+		contentPane.add(lblCantidad);
+		
+		lblP = new JLabel("");
+		lblP.setFont(new Font("Nirmala UI", Font.BOLD, 19));
+		lblP.setBounds(335, 133, 64, 31);
+		contentPane.add(lblP);
 		actualizarTabla();
 	}
 
@@ -215,13 +253,14 @@ public class vCategoria extends JFrame {
 		while (modelo.getRowCount() > 0) {
 			modelo.removeRow(0);
 		}
-		lista = dao.fetchCategoria();
-		for (Categoria u : lista) {
+		lista = dao.fetchAbastecer();
+		for (Abastecer u : lista) {
 			Object o[] = new Object[4];
-			o[0] = u.getID();
-			o[1] = u.getCategoria();
+			o[0] = u.getId();
+			o[1] = u.getDescripcion();
+			o[2] = u.getCantidad();
 			modelo.addRow(o);
 		}
-		tblCategoria.setModel(modelo);
+		tblinventario.setModel(modelo);
 	}
 }

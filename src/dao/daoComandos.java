@@ -7,21 +7,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import Conexion.conexion;
+import modelo.Abastecer;
 import modelo.Categoria;
 import modelo.Usuario;
 
-public class daoCategoria {
+public class daoComandos {
 	conexion cx = null;
 
-	public daoCategoria() {
+	public daoComandos() {
 		cx = new conexion();
 	}
 
-	public boolean insertarCategoria(Categoria user) {
+	public boolean insertarProducto(Abastecer A) {
 		PreparedStatement ps = null;
 		try {
-			ps = cx.conectar().prepareStatement("INSERT INTO categoria VALUES(null,?)");
-			ps.setString(1, user.getCategoria());
+			ps = cx.conectar().prepareStatement("INSERT INTO inventario VALUES(null,?,?)");
+			ps.setString(1, A.getDescripcion());
+			ps.setInt(1, A.getCantidad());
 			ps.executeUpdate();
 			return true;
 		} catch (SQLException e) {
@@ -31,17 +33,18 @@ public class daoCategoria {
 
 	}
 
-	public ArrayList<Categoria> fetchCategoria() {
-		ArrayList<Categoria> lista = new ArrayList<Categoria>();
+	public ArrayList<Abastecer> fetchAbastecer() {
+		ArrayList<Abastecer> lista = new ArrayList<Abastecer>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			ps = cx.conectar().prepareStatement("SELECT *FROM categoria");
+			ps = cx.conectar().prepareStatement("SELECT *FROM inventario");
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				Categoria u = new Categoria();
-				u.setID(rs.getInt("id"));
-				u.setCategoria(rs.getString("categoria"));
+				Abastecer u = new Abastecer();
+				u.setId(rs.getInt("id"));
+				u.setDescripcion(rs.getString("descripcion"));
+				u.setCantidad(rs.getInt("cantidad"));
 				lista.add(u);
 			}
 		} catch (SQLException e) {
@@ -51,11 +54,11 @@ public class daoCategoria {
 		return lista;
 	}
 
-	public boolean EliminarCategoria(int ID) {
+	public boolean EliminarProducto(int Id) {
 		PreparedStatement ps = null;
 		try {
-			ps = cx.conectar().prepareStatement("DELETE FROM categoria WHERE ID=?");
-			ps.setInt(1, ID);
+			ps = cx.conectar().prepareStatement("DELETE FROM inventario WHERE id=?");
+			ps.setInt(1, Id);
 			ps.executeUpdate();
 			return true;
 		} catch (SQLException e) {
@@ -65,12 +68,13 @@ public class daoCategoria {
 
 	}
 
-	public boolean editarUsuario(Categoria user) {
+	public boolean editarProducto(Abastecer user) {
 		PreparedStatement ps = null;
 		try {
-			ps = cx.conectar().prepareStatement("UPDATE usuario SET user=?,password=?,nombre=? WHERE id=?");
-			ps.setInt(1, user.getID());
-			ps.setString(2, user.getCategoria());
+			ps = cx.conectar().prepareStatement("UPDATE inventario SET descripcion=?,cantidad=? WHERE id=?");
+			ps.setInt(1, user.getId());
+			ps.setString(2, user.getDescripcion());
+			ps.setInt(3, user.getCantidad());
 			ps.executeUpdate();
 			return true;
 		} catch (SQLException e) {

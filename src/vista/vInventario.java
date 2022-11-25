@@ -78,7 +78,7 @@ public class vInventario extends JFrame {
 
 	public vInventario() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(vInventario.class.getResource("/img/Java.jpg")));
-		setTitle("CATEGORIA");
+		setTitle("UNIDADES X PRODUCTO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 642, 424);
 		setLocationRelativeTo(null);
@@ -102,13 +102,14 @@ public class vInventario extends JFrame {
 		btnAgregar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (txtD.getText().equals("")|| sldCantidad.getAccessibleContext().equals("")) {
+					if (txtD.getText().equals("")|| sldCantidad.getValue()<=0) {
 						JOptionPane.showMessageDialog(null, "CAMPOS VACIOS ");
 						return;
 					}
 					Abastecer user = new Abastecer();
 					user.setDescripcion(txtD.getText());
 					user.setCantidad(sldCantidad.getValue());
+					System.out.println("Cantidad: "+sldCantidad.getValue());
 					if (dao.insertarProducto(user)) {
 						actualizarTabla();
 						limpiar();
@@ -138,7 +139,6 @@ public class vInventario extends JFrame {
 					abastecer.setCantidad(sldCantidad.getValue());
 					if (dao.editarProducto(abastecer)) {
 						actualizarTabla();
-						limpiar();
 						JOptionPane.showMessageDialog(null, "SE ACTUALIZO  CORRECTAMENTE");
 					} else {
 						JOptionPane.showMessageDialog(null, "ERROR");
@@ -230,7 +230,7 @@ public class vInventario extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				producto = sldCantidad.getValue();
 				lblP.setText(""+ producto);
-				actualizarTabla();
+				//actualizarTabla();
 			}
 		});
 		sldCantidad.setValue(0);

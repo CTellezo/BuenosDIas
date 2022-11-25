@@ -23,7 +23,7 @@ public class daoComandos {
 		try {
 			ps = cx.conectar().prepareStatement("INSERT INTO inventario VALUES(null,?,?)");
 			ps.setString(1, A.getDescripcion());
-			ps.setInt(1, A.getCantidad());
+			ps.setInt(2, A.getCantidad());
 			ps.executeUpdate();
 			return true;
 		} catch (SQLException e) {
